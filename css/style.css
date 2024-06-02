@@ -1,0 +1,44 @@
+.container{
+    width: 65%;
+    margin: auto;
+    height: 100vh;
+    display: flex;
+    justify-content:center;
+    align-items: center;
+
+}
+
+.chess-board{
+    width: 75%;
+    height: 85%;
+    display: grid;
+    grid-template-columns: repeat(8, 0.5fr);
+    grid-gap: 0px;
+    grid-template-rows: repeat(8 , 0.5fr);
+    border: 5px solid #333;
+}
+
+.white {
+    background-color: antiquewhite ;
+
+}
+.black {
+    background-color: rgb(12, 67, 81);
+}
+
+.Black-piceses{
+    width: 6rem;
+}
+#king{
+    font-size: 4rem;
+    margin: 0px;
+    padding: 0px ;
+}
+.node{
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 65px;
+    font-weight: bolde;
+}
