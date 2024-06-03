@@ -19,26 +19,28 @@
 }
 
 .white {
-    background-color: antiquewhite ;
+    background-color: rgb(230, 216, 199) ;
 
 }
 .black {
     background-color: rgb(12, 67, 81);
 }
 
-.Black-piceses{
-    width: 6rem;
-}
-#king{
-    font-size: 4rem;
-    margin: 0px;
-    padding: 0px ;
-}
+
+
 .node{
     
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 65px;
-    font-weight: bolde;
+    user-select: none; 
+    position: relative;
+
+}
+.white-pieces{
+    color: white;
+}
+.dragging {
+    opacity: 0.5; 
 }
