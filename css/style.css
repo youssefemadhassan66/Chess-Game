@@ -16,6 +16,7 @@
     grid-gap: 0px;
     grid-template-rows: repeat(8 , 0.5fr);
     border: 5px solid #333;
+    transition: all 0.3s ease;
 }
 
 .white {
@@ -36,11 +37,26 @@
     font-size: 65px;
     user-select: none; 
     position: relative;
+    transition: all .3s ease;
 
+}
+
+
+.Piece {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;  
+    user-select: none;
+    transition: transform 0.3s ease;
 }
 .white-pieces{
     color: white;
 }
 .dragging {
-    opacity: 0.5; 
+    opacity: 0.5;
+    cursor: grabbing;  
+    transform: scale(1.1);  
 }
