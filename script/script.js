@@ -50,6 +50,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 draggedPiece.classList.remove("dragging");
                 draggedPiece = null;
                 draggedPieceIndex = null;
+
             }
         });
 
@@ -60,25 +61,31 @@ document.addEventListener("DOMContentLoaded", function() {
 
             node.addEventListener("drop", function(event) {
                 event.preventDefault();
-                if (draggedPiece && event.target.classList.contains("node")) {
-                    const targetNode = event.target;
-                    targetNode.innerHTML = "";
-                    targetNode.appendChild(draggedPiece);
-
-                    const dropIndex = Array.from(nodes).findIndex(n => n.contains(draggedPiece));
-
-                    if (!valid_Move(draggedPiece, draggedPieceIndex, dropIndex)) {
+                const targetNode = event.target.closest(".node");
+                if (draggedPiece && targetNode) {
+                    const dropIndex = Array.from(nodes).findIndex(n => n === targetNode);
+                    
+                    const existingPiece = targetNode.querySelector(".white-pieces");
+                    
+                    if ((!valid_Move(draggedPiece, draggedPieceIndex, dropIndex, existingPiece))) {
                         console.log("Invalid move");
-                        targetNode.removeChild(draggedPiece);
-                        nodes[draggedPieceIndex].appendChild(draggedPiece);
-                    } else {
+                    } 
+                    else {
                         console.log("Valid move");
+
+                        if (existingPiece && existingPiece !== draggedPiece) {
+                            targetNode.removeChild(existingPiece);
+                        }
+
+                        targetNode.innerHTML = "";
+                        targetNode.appendChild(draggedPiece);
                         turn++;
                         updateDraggableState();
                     }
                 }
             });
         });
+        
     }
 
     function updateDraggableState() {
@@ -101,26 +108,39 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
+        const nodes = document.querySelectorAll(".node");
+            function valid_Move(piece, start, end,existingPiece) {
+                
+                const whitPieces = piece.classList.contains("white-pieces");
+                const blackPieces = piece.classList.contains("black-pieces");
+                
+                if(existingPiece){
+                    const existingWhitePiece = existingPiece.classList.contains("white-pieces");
+                    const existingBlackPiece = existingPiece.classList.contains("black-pieces");
+                    if((whitPieces &&  existingWhitePiece) ||  (blackPieces && existingBlackPiece)){
+                        return false;
+                    }
+                }
 
-function valid_Move(piece, start, end) {
-    switch (piece.innerHTML) {
-        case "♟":
-            return validPawnMove(start, end,piece);
-        case "♜":
-            return validRookMove(start, end);
-        case "♞":
-            return validKnightMove(start, end);
-        case "♝":
-            return validBishopMove(start, end);
-        case "♛":
-            return validQueenMove(start, end);
-        case "♚":
-            return validKingMove(start, end);
-        default:
-            return false;
-    }
-}
- 
+
+                switch (piece.innerHTML) {
+                    case "♟":
+                        return validPawnMove(start, end,piece);
+                    case "♜":
+                        return validRookMove(start, end);
+                    case "♞":
+                        return validKnightMove(start, end);
+                    case "♝":
+                        return validBishopMove(start, end);
+                    case "♛":
+                        return validQueenMove(start, end);
+                    case "♚":
+                        return validKingMove(start, end);
+                    default:
+                        return false;
+                }
+            }
+            
         // Pawn move 
         function validPawnMove(start, end, piece) {
             const direction = piece.classList.contains("white-pieces") ? -8 : 8;
@@ -140,49 +160,78 @@ function valid_Move(piece, start, end) {
         
             return false;
         }
-        // Rook Move
+     // Rook Move
+ function validRookMove(start, end) {
+    const startX = start % 8;
+    const startY = Math.floor(start / 8);
+    const endX = end % 8;
+    const endY = Math.floor(end / 8);
 
-        function validRookMove(start, end) {
-                
-            return start % 8 == end % 8 || Math.floor(start / 8) == Math.floor(end / 8);
+    // Rook can move either horizontally or vertically
+    if (startX === endX || startY === endY) {
+        const step = (startX === endX) ? 8 : 1; 
+        const direction = (end > start) ? step : -step;
+
+
+        for (let i = start + direction; i !== end; i += direction) {
+           
+            if (i < 0 || i >= nodes.length) {
+                return false;
+            }
+            if (nodes[i].querySelector(".Piece")) {
+                return false; 
+            }
         }
 
-            // Knight Move
-        function validKnightMove(start, end) {    
+        return true; 
+    }
+
+    return false; 
+}
+
+
+     // Knight Move
+    function validKnightMove(start, end) {    
         return Math.abs(start - end) % 10 === 0 || Math.abs(start - end) % 15 === 0 || Math.abs(start - end) % 6 === 0 || Math.abs(start - end) % 17 === 0;     
         }
-            // Bishop Move
-        function validBishopMove(start, end) {
-            return  end % 9 === start % 9 || end % 7  === start % 7;
-        }
 
-        // Queen Move
+     // Bishop Move
+     function validBishopMove(start, end) {
+        
+        const diff = end - start;
+        const step = (Math.abs(diff) % 9 === 0) ? 9 : 7;
+    
+       
+        if (Math.abs(diff) % step !== 0) {
+            return false;
+        }
+       
+        const direction = (diff > 0) ? step : -step;
+       
+        for (let i = start + direction; i !== end; i += direction) {
+            
+            if (i < 0 || i >= nodes.length) {
+                return false;
+            }
+            
+            if (nodes[i].querySelector(".Piece")) {
+                return false; 
+            }
+        }
+    
+        return true; 
+    }
+    
+     // Queen Move
         function validQueenMove(start, end) {
             return validBishopMove(start,end) || validRookMove(start,end);
         }
 
 
 
-        // King Move
-        function validKingMove(start, end) {    
-            let verticalDirection = 8;
-            let horizontalDirection = 1;
-            let leftDiagonal = 9;
-            let rightDiagonal = 7;
-            if(end === start + horizontalDirection || end  === start - horizontalDirection ){
-            return true;
-            }
-        
-            if(end === start + verticalDirection || end  === start - verticalDirection ){
-                return true;
-            }
-        
-            if(end === start + leftDiagonal || end  === start - leftDiagonal ){
-                return true;
-            }
-        
-            if(end === start + rightDiagonal || end  === start - rightDiagonal ){
-                return true;
-            }
-            return false;
-        }
+     // King Move
+     function validKingMove(start, end) {
+        const diff = Math.abs(start - end);
+
+        return diff === 1 || diff === 7 || diff === 8 || diff === 9;
+    }
