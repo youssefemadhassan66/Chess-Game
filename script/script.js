@@ -140,98 +140,110 @@ document.addEventListener("DOMContentLoaded", function() {
                         return false;
                 }
             }
-            
+        
         // Pawn move 
         function validPawnMove(start, end, piece) {
             const direction = piece.classList.contains("white-pieces") ? -8 : 8;
+            const startRow = Math.floor(start / 8);
             
+
+            // Single step move
             if (end === start + direction) {
-                
-                return true;
-            }
-        
-            if ((piece.classList.contains("white-pieces") && Math.floor(start / 8) === 6) ||
-                (piece.classList.contains("black-pieces") && Math.floor(start / 8) === 1)) {
-                
-                if (end === start + 2 * direction) {
+                if (!nodes[end].querySelector(".Piece")) {
                     return true;
                 }
             }
         
-            return false;
-        }
-     // Rook Move
- function validRookMove(start, end) {
-    const startX = start % 8;
-    const startY = Math.floor(start / 8);
-    const endX = end % 8;
-    const endY = Math.floor(end / 8);
-
-    // Rook can move either horizontally or vertically
-    if (startX === endX || startY === endY) {
-        const step = (startX === endX) ? 8 : 1; 
-        const direction = (end > start) ? step : -step;
-
-
-        for (let i = start + direction; i !== end; i += direction) {
-           
-            if (i < 0 || i >= nodes.length) {
-                return false;
+            
+            if ((piece.classList.contains("white-pieces") && startRow === 6) ||
+                (piece.classList.contains("black-pieces") && startRow === 1)) {
+                if (end === start + 2 * direction) {
+                    if (!nodes[start + direction].querySelector(".Piece") && !nodes[end].querySelector(".Piece")) {
+                        return true;
+                    }
+                }
             }
-            if (nodes[i].querySelector(".Piece")) {
-                return false; 
-            }
-        }
-
-        return true; 
-    }
-
-    return false; 
-}
-
-
-     // Knight Move
-    function validKnightMove(start, end) {    
-        return Math.abs(start - end) % 10 === 0 || Math.abs(start - end) % 15 === 0 || Math.abs(start - end) % 6 === 0 || Math.abs(start - end) % 17 === 0;     
-        }
-
-     // Bishop Move
-     function validBishopMove(start, end) {
         
-        const diff = end - start;
-        const step = (Math.abs(diff) % 9 === 0) ? 9 : 7;
-    
-       
-        if (Math.abs(diff) % step !== 0) {
+            // Diagonal capture move
+            if(end === start + direction + 1 || end === start + direction - 1 ){
+                
+                if (nodes[end].querySelector(".Piece") ){
+                    return true;
+                }   
+            }
+            
             return false;
-        }
-       
-        const direction = (diff > 0) ? step : -step;
-       
-        for (let i = start + direction; i !== end; i += direction) {
+                }
+                
+            // Rook Move
+            function validRookMove(start, end) {
+            const startX = start % 8;
+            const startY = Math.floor(start / 8);
+            const endX = end % 8;
+            const endY = Math.floor(end / 8);
+
             
-            if (i < 0 || i >= nodes.length) {
-                return false;
+            if (startX === endX || startY === endY) {
+                const step = (startX === endX) ? 8 : 1; 
+                const direction = (end > start) ? step : -step;
+
+
+                for (let i = start + direction; i !== end; i += direction) {
+                
+                    if (nodes[i].querySelector(".Piece")) {
+                        return false; 
+                    }
+                }
+
+                return true; 
+            }
+
+            return false; 
+        }
+
+
+            // Knight Move
+            function validKnightMove(start, end) {    
+                return Math.abs(start - end) % 10 === 0 || Math.abs(start - end) % 15 === 0 || Math.abs(start - end) % 6 === 0 || Math.abs(start - end) % 17 === 0;     
+                }
+
+            // Bishop Move
+            function validBishopMove(start, end) {
+                
+                const diff = end - start;
+                const step = (Math.abs(diff) % 9 === 0) ? 9 : 7;
+            
+            
+                if (Math.abs(diff) % step !== 0) {
+                    return false;
+                }
+            
+                const direction = (diff > 0) ? step : -step;
+            
+                for (let i = start + direction; i !== end; i += direction) {
+                    
+                    if (i < 0 || i >= nodes.length) {
+                        return false;
+                    }
+                    
+                    if (nodes[i].querySelector(".Piece")) {
+                        return false; 
+                    }
+                }
+            
+                return true; 
             }
             
-            if (nodes[i].querySelector(".Piece")) {
-                return false; 
+            // Queen Move
+                function validQueenMove(start, end) {
+                    return validBishopMove(start,end) || validRookMove(start,end);
+                }
+
+
+
+            // King Move
+            function validKingMove(start, end) {
+                const diff = Math.abs(start - end);
+
+                return diff === 1 || diff === 7 || diff === 8 || diff === 9;
             }
-        }
-    
-        return true; 
-    }
-    
-     // Queen Move
-        function validQueenMove(start, end) {
-            return validBishopMove(start,end) || validRookMove(start,end);
-        }
-
-
-
-     // King Move
-     function validKingMove(start, end) {
-        const diff = Math.abs(start - end);
-
-        return diff === 1 || diff === 7 || diff === 8 || diff === 9;
-    }

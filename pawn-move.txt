@@ -1,0 +1,5 @@
+1 - start  = 17 , end = 25 ,  move = 8 if(piece in 24 ) return fasle 
+
+capture +7 , + 9 if(Piece in 24 or peiece in 26) capture
+
+
